@@ -1,0 +1,115 @@
+.task-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card.total .stat-number {
+  color: #667eea;
+}
+
+.stat-card.total {
+  border-top: 4px solid #667eea;
+}
+
+.stat-card.completed .stat-number {
+  color: #4CAF50;
+}
+
+.stat-card.completed {
+  border-top: 4px solid #4CAF50;
+}
+
+.stat-card.in-progress .stat-number {
+  color: #FF9800;
+}
+
+.stat-card.in-progress {
+  border-top: 4px solid #FF9800;
+}
+
+.stat-card.todo .stat-number {
+  color: #2196F3;
+}
+
+.stat-card.todo {
+  border-top: 4px solid #2196F3;
+}
+
+.stat-card.high-priority .stat-number {
+  color: #f44336;
+}
+
+.stat-card.high-priority {
+  border-top: 4px solid #f44336;
+}
+
+@media (max-width: 1024px) {
+  .task-stats {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .task-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-stats {
+    grid-template-columns: 1fr;
+  }
+}
