@@ -32,7 +32,7 @@ const Login = () => {
       login(response.data.user, response.data.token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,11 +41,18 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Login</h2>
-        {error && <div className="error-message">{error}</div>}
+        <h2>Welcome Back</h2>
+        <p className="form-subtitle">Enter your metrics to access your dashboard</p>
+        
+        {error && (
+          <div className="error-message">
+            ⚠️ {error}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email Address</label>
             <input
               type="email"
               id="email"
@@ -53,7 +60,7 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              placeholder="Enter your email"
+              placeholder="name@example.com"
             />
           </div>
           <div className="form-group">
@@ -65,15 +72,17 @@ const Login = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Enter your password"
+              placeholder="••••••••"
             />
           </div>
+          
           <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Securing Session...' : 'Sign In To Workspace →'}
           </button>
         </form>
+        
         <p className="auth-link">
-          Don't have an account? <Link to="/register">Register</Link>
+          New to the hub? <Link to="/register">Create an account</Link>
         </p>
       </div>
     </div>

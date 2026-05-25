@@ -11,38 +11,40 @@ import '../styles/Dashboard.css';
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState(null);
-  const [filters, setFilters] = useState({
-    status: '',
-    priority: '',
-    search: '',
-  });
+  const [filters, setFilters] = useState({ status: '', priority: '', search: '' });
   const [sortBy, setSortBy] = useState('createdAt');
-  const [loading, setLoading] = useState(false);
+  const [loadingTasks, setLoadingTasks] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const { user, logout } = useAuth();
+  
+  // Extract custom unified loading attribute from context
+  const { user, logout, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  // Route protection barrier logic
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       navigate('/login');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
+  // Data fetching hook
   useEffect(() => {
-    fetchTasks();
-    fetchStats();
-  }, [filters, sortBy]);
+    if (user) {
+      fetchTasks();
+      fetchStats();
+    }
+  }, [filters, sortBy, user]);
 
   const fetchTasks = async () => {
     try {
-      setLoading(true);
+      setLoadingTasks(true);
       const response = await taskAPI.getTasks({ ...filters, sortBy });
       setTasks(response.data.tasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     } finally {
-      setLoading(false);
+      setLoadingTasks(false);
     }
   };
 
@@ -55,9 +57,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-  };
+  const handleFilterChange = (newFilters) => setFilters(newFilters);
 
   const handleAddTask = async (taskData) => {
     try {
@@ -96,15 +96,22 @@ const Dashboard = () => {
     navigate('/login');
   };
 
+  // Guard execution paths if authentication initialization is rendering
+  if (authLoading) {
+    return <div className="loading">Gathering your universe...</div>;
+  }
+
+  if (!user) return null;
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-left">
-          <h1>Task Management</h1>
-          {user && <p className="user-info">Welcome, {user.name}!</p>}
+          <h1>Task Hub</h1>
+          <p className="user-info">Let's crush it today, {user.name}!</p>
         </div>
         <button className="logout-btn" onClick={handleLogout}>
-          Logout
+          Sign Out
         </button>
       </header>
 
@@ -112,34 +119,37 @@ const Dashboard = () => {
         {stats && <TaskStats stats={stats} />}
 
         <div className="dashboard-content">
-          <div className="left-panel">
+          <aside className="left-panel">
             <div className="form-section">
               <button
-                className="btn-primary"
+                className={`btn-primary ${showForm ? 'cancel-mode' : ''}`}
                 onClick={() => setShowForm(!showForm)}
+                style={{ marginBottom: showForm ? '1.5rem' : '0' }}
               >
-                {showForm ? 'Cancel' : 'Add New Task'}
+                {showForm ? '💥 Close Action Panel' : '✨ Create New Task'}
               </button>
               {showForm && (
                 <TaskForm onSubmit={handleAddTask} onCancel={() => setShowForm(false)} />
               )}
             </div>
-          </div>
+          </aside>
 
-          <div className="right-panel">
-            <TaskFilters filters={filters} onFilterChange={handleFilterChange} />
+          <section className="right-panel">
+            <div className="right-panel-controls">
+              <TaskFilters filters={filters} onFilterChange={handleFilterChange} />
 
-            <div className="sort-section">
-              <label htmlFor="sort">Sort by:</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="createdAt">Recently Created</option>
-                <option value="dueDate">Due Date</option>
-                <option value="priority">Priority</option>
-              </select>
+              <div className="sort-section">
+                <label htmlFor="sort">Sort</label>
+                <select id="sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                  <option value="createdAt">📅 Newest</option>
+                  <option value="dueDate">⏰ Limit Date</option>
+                  <option value="priority">🔥 Importance</option>
+                </select>
+              </div>
             </div>
 
-            {loading ? (
-              <p className="loading">Loading tasks...</p>
+            {loadingTasks ? (
+              <div className="loading">Updating task stacks...</div>
             ) : (
               <TaskList
                 tasks={tasks}
@@ -149,7 +159,7 @@ const Dashboard = () => {
                 onEditStart={setEditingTask}
               />
             )}
-          </div>
+          </section>
         </div>
       </main>
     </div>
